@@ -33,11 +33,13 @@ module Rack
     private
 
     def proxy(env, source_request, matcher)
-      uri = matcher.get_uri(source_request.fullpath,env)
+      
+      options = @global_options.dup.merge(matcher.options)
+
+      uri = matcher.get_uri(source_request.fullpath,env,options[:append_path])
       if uri.nil?
         return @app.call(env)
       end
-      options = @global_options.dup.merge(matcher.options)
 
       # Initialize request
       target_request = Net::HTTP.const_get(source_request.request_method.capitalize).new(uri.request_uri)
